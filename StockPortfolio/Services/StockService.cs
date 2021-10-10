@@ -30,7 +30,22 @@ namespace StockPortfolio.Services
 
         public async Task<Stock> Add(Stock stock)
         {
-            return await _stockRepo.AddAsync(stock);
+            // Check if symbol already existing then update the existing record by adding contracts and average the price
+            var existing = await _stockRepo.GetAllAsync(new Stock { Symbol = stock.Symbol});
+
+            if (existing != null && existing.Count() > 0)
+            {
+                stock.StockId = existing.First().StockId;
+                stock.BuyPrice = (existing.First().BuyPrice + stock.BuyPrice) / 2;
+                stock.Contracts = existing.First().Contracts + stock.Contracts;
+
+               return await _stockRepo.UpdateAsync(stock);
+            }
+            else
+            {
+                // Else create new stock entry in the portfolio
+                return await _stockRepo.AddAsync(stock);
+            }
         }
 
         public async Task<bool> Delete(int Id)

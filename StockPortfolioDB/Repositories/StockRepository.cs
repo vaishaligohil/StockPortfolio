@@ -11,7 +11,7 @@ namespace StockPortfolioDB.Repositories
 {
     public interface IStockRepository
     {
-        Task<IEnumerable<Stock>> GetAllAsync();
+        Task<IEnumerable<Stock>> GetAllAsync(Stock filter = null);
 
         Task<Stock> AddAsync(Stock stock);
 
@@ -54,11 +54,18 @@ namespace StockPortfolioDB.Repositories
             }
         }
 
-        public async Task<IEnumerable<Stock>> GetAllAsync()
+        public async Task<IEnumerable<Stock>> GetAllAsync(Stock filter = null)
         {
             using (var ctx = _stockContextFactory.ReadOnly())
             {
-                return await ctx.Stock.ToListAsync();
+                IQueryable<Stock> query = ctx.Stock;
+
+                if (filter != null && filter.Symbol != "")
+                {
+                    query = query.Where(p => p.Symbol == filter.Symbol);
+                }
+
+                return await query.ToListAsync();
             }
         }
 
