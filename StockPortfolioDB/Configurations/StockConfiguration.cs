@@ -12,7 +12,7 @@ namespace StockPortfolioDB.Configurations
         public void Configure(EntityTypeBuilder<Stock> builder)
         {
             builder.ToTable(typeof(Stock).Name, "dbo");
-            builder.HasIndex(e => e.StockId, "PK_Stock");
+            builder.HasKey(e => e.StockId);
         }
     }
 }
